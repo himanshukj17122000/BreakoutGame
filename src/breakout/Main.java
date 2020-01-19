@@ -36,6 +36,7 @@ public class Main extends Application {
     private static Timeline animation = new Timeline();
     public static String filename = "";
     public static int count = 1;
+    private static int damage =1;
     Brick first= new Brick();
     Brick second= new Brick();
     Brick third= new Brick();
@@ -68,9 +69,11 @@ public class Main extends Application {
     public static double time;
     public ArrayList<Brick> brickw = new ArrayList<Brick>();
     private Label label2 = new Label();
+    private Label label3 = new Label();
     private Scene myScene;
     private ImageView myBouncer;
     private Rectangle myMover;
+
 
 
     private Boolean move = false;
@@ -99,8 +102,15 @@ public class Main extends Application {
             imageView.setFitHeight(400);
             imageView.setFitWidth(400);
             imageView.setPreserveRatio(true);
-            Group root = new Group(imageView);
+            Button replay= new Button();
+            replay.setText("Replay");
+            replay.setOnMouseClicked(e->mouseclicked());
+            replay.setLayoutY(SIZE-50);
+            replay.setLayoutX(SIZE/2-40);
+            Group root = new Group();
             Scene scene = new Scene(root, 400, 400,BACKGROUND);
+            root.getChildren().add(imageView);
+            root.getChildren().add(replay);
             stagee.setScene(scene);
             animation.stop();
         } else {
@@ -109,6 +119,11 @@ public class Main extends Application {
 //            myBouncer.setY(SIZE-MOVER_HEIGHT-10-MOVER_HEIGHT);
             checkclick(stagee);
         }
+    }
+
+    private void mouseclicked() {
+        count=1;
+        changeScene();
     }
 
     public Scene Splash() {
@@ -150,7 +165,7 @@ public class Main extends Application {
         Image image = new Image(this.getClass().getClassLoader().getResourceAsStream(BOUNCER_IMAGE));
         myBouncer = new ImageView(image);
          Group root = new Group();
-        myMover = new Rectangle(width / 2 - MOVER_SIZE / 2, height - MOVER_HEIGHT - 10, MOVER_SIZE, MOVER_HEIGHT);
+        myMover = new Rectangle(width / 2 - MOVER_SIZE / 2, height - MOVER_HEIGHT - 20, MOVER_SIZE, MOVER_HEIGHT);
         Image ima = new Image(this.getClass().getClassLoader().getResourceAsStream(paddle));
         ImagePattern imagePattern = new ImagePattern(ima);
         myMover.setFill(imagePattern);
@@ -160,6 +175,8 @@ public class Main extends Application {
 //      myBouncer.setY(height-MOVER_HEIGHT-10-MOVER_HEIGHT);
         label2.setLayoutY(SIZE / 1.2);
         label2.setLayoutX(SIZE - 80);
+        label3.setLayoutY(SIZE / 1.1);
+        label3.setLayoutX(SIZE - 80);
 //      move=false;
 //      myGrower = new Rectangle(width / 2 - GROWER_SIZE / 2, height / 2 + 50, GROWER_SIZE, GROWER_SIZE);
 //      myGrower.setFill(GROWER_COLOR);
@@ -167,9 +184,10 @@ public class Main extends Application {
         root.getChildren().add(myBouncer);
         root.getChildren().add(myMover);
         root.getChildren().add(label2);
+        root.getChildren().add(label3);
 //      root.getChildren().add(myGrower);
         brickwall(root, level);
-//        bombbricks();
+        bombbricks();
         // create a place to see the shapes
         Scene scene = new Scene(root, width, height, background);
         // respond to input
@@ -195,6 +213,7 @@ public class Main extends Application {
         if((myBouncer.getY()>stagee.getHeight() || myBouncer.getY()<-20) && lives>=0){
             lives--;
             changeScene();
+
         }
         if (brickw.size() == 0) {
             count++;
@@ -245,39 +264,52 @@ public class Main extends Application {
 
            if ((myBouncer.getX() >= brickw.get(i).getImage().getX() && myBouncer.getX() <= brickw.get(i).getImage().getX() + brickw.get(i).getWidth()-2) && (myBouncer.getY() >= brickw.get(i).getImage().getY() && myBouncer.getY() <= brickw.get(i).getImage().getY() + brickw.get(i).getHeight())) {
 //               System.out.println(brickw.get(i).getType());
+               System.out.println(damage);
                directionY *= -1;
                directionX*=-1;
-                brickw.get(i).ifhit();
+                brickw.get(i).ifhit(damage);
 //                System.out.print(brickw.get(i).getType());
-                if(brickw.get(i).getType().equals("brick2.gif") && brickw.get(i).Strikes()==0){
-                    lives++;
+                if(brickw.get(i).getType().equals("brick2.gif") && brickw.get(i).Strikes()<=0){
+                    int rand= getRandomNumberInRange(2,0);
+                    if(rand==0){
+                    changeSpeed();}
+                    if(rand==1){
+                        increaseLives();
+                    }
+                    if(rand==2){
+                    changeDamage();}
+
                 }
-//               if(brickw.get(i)==bomb1 && brickw.get(i).Strikes()==0) {
-//
-//                  if(inBounds(first)){
-//                      first.getImage().imageProperty().set(null);
-//                      brickw.remove(first);
-//                      score+=10;
-//                  }
-//                   if(inBounds(second)){
-//                       second.getImage().imageProperty().set(null);
-//                       brickw.remove(second);
-//                       score+=10;
-//                   }}
-//               if(brickw.get(i)==bomb2 && brickw.get(i).Strikes()==0){
-//                   if(inBounds(third)){
-//                       third.getImage().imageProperty().set(null);
-//                       brickw.remove(third);
-//                       score+=10;
-//                   }
-//                   if(inBounds(fourth)){
-//                       fourth.getImage().imageProperty().set(null);
-//                       brickw.remove(fourth);
-//                       score+=10;
-//                   }
-//               }
-                if (brickw.get(i).Strikes() == 0) {
-                    System.out.println(brickw.get(i).getType());
+               if(brickw.get(i)==bomb1 && brickw.get(i).Strikes()<=0) {
+                   brickw.get(i).getImage().imageProperty().set(null);
+                   brickw.remove(brickw.get(i));
+                   scoregame += 5;
+                  if(inBounds(first)){
+                      first.getImage().imageProperty().set(null);
+                      brickw.remove(first);
+                      scoregame += 5;
+                  }
+                   if(inBounds(second)){
+                       second.getImage().imageProperty().set(null);
+                       brickw.remove(second);
+                       scoregame += 5;
+                   }}
+               if(brickw.get(i)==bomb2 && brickw.get(i).Strikes()<=0){
+                   brickw.get(i).getImage().imageProperty().set(null);
+                   brickw.remove(brickw.get(i));
+                   scoregame += 5;
+                   if(inBounds(third)){
+                       third.getImage().imageProperty().set(null);
+                       brickw.remove(third);
+                       scoregame += 5;
+                   }
+                   if(inBounds(fourth)){
+                       fourth.getImage().imageProperty().set(null);
+                       brickw.remove(fourth);
+                       scoregame += 5;
+                   }
+               }
+                if (brickw.get(i).Strikes() <= 0) {
                     brickw.get(i).getImage().imageProperty().set(null);
                     brickw.remove(brickw.get(i));
                     String a = "";
@@ -285,11 +317,10 @@ public class Main extends Application {
                     a += scoregame;
                     label2.setText("The score \nis " + a);
                     label2.setTextFill(Color.web("#0076a3"));
+                    label3.setText("\nLives: " + lives);
+                    label3.setTextFill(Color.web("#0076a3"));
                     return;
                 }
-
-
-//              System.out.print(brickw.get(i).Strikes());
                 directionY *= -1;
             } }
         if (myBouncer.getX() + myBouncer.getBoundsInLocal().getWidth() >= myScene.getWidth()) {
@@ -298,7 +329,6 @@ public class Main extends Application {
         if (myBouncer.getX() <= 0) {
             directionX *= -1;
         }
-
         if (myBouncer.getY() <= 0) {
             directionY *= -1;
         }
@@ -311,6 +341,37 @@ public class Main extends Application {
         }
     }
 
+    private void changeDamage() {
+        damage=2;
+        new java.util.Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        damage=1;
+                    }
+                },
+                5000
+        );
+    }
+
+    private void increaseLives() {
+        lives++;
+    }
+
+    private void changeSpeed() {
+        BOUNCER_SPEED=30;
+        new java.util.Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        BOUNCER_SPEED=50;
+                    }
+                },
+                10000
+        );
+
+    }
+
     private boolean inBounds(Brick brick) {
         if(brick!=null){
             return true;
@@ -320,8 +381,6 @@ public class Main extends Application {
 
     private void changeScene() {
         SceneChange();
-        BOUNCER_SPEED = 30;
-        MOVER_SPEED = 70;
         if (count == 2) {
             makeScene("level2.txt");
 
@@ -337,12 +396,20 @@ public class Main extends Application {
     private void bombbricks(){
         if(count==3) {
             first = brickw.get(0);
-            second = brickw.get(12);
+            second = brickw.get(10);
             third = brickw.get(3);
-            fourth = brickw.get(15);
-            bomb1= brickw.get(6);
-            bomb2= brickw.get(9);
+            fourth = brickw.get(13);
+            bomb1= brickw.get(7);
+            bomb2= brickw.get(8);
+            System.out.println(first.Strikes());
+            System.out.println(second.Strikes());
+            System.out.println(third.Strikes());
+            System.out.println(fourth.Strikes());
+            System.out.println(bomb1.Strikes());
+            System.out.println(bomb2.Strikes());
+
         }
+
     }
 
     // What to do each time a key is pressed
@@ -378,6 +445,7 @@ public class Main extends Application {
         }
       else if(code==KeyCode.R){
           changeScene();
+          scoregame=0;
       }
       else if(code==KeyCode.N){
           count++;
@@ -467,21 +535,22 @@ public class Main extends Application {
 
     }
     private static void setDistance(){
-        distance= getRandomNumberInRange()*10;
+        distance= getRandomNumberInRange(5,3)*10;
     }
 
-    private static int getRandomNumberInRange() {
+    private static int getRandomNumberInRange(int max, int min) {
         Random r = new Random();
-        return r.nextInt(3)+3;
+        return r.nextInt(max-min+1)+min;
 
     }
     private void SceneChange() {
+        BOUNCER_SPEED = 30;
+        MOVER_SPEED = 70;
         animation.pause();
-        score=0;
+        scoregame=0;
 //        startMessage.setVisible(true);
         myBouncer.setX(myScene.getWidth()/2);
-        myBouncer.setY(100);
-
+        myBouncer.setY(0);
         directionX = 1;
         directionY = 1;
         extended=false;

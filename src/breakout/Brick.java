@@ -22,8 +22,8 @@ public class Brick{
     public int getHeight(){
         return this.HEIGHT;
     }
-    public void ifhit(){
-       this.strikes--;
+    public void ifhit(int damagedone){
+       this.setStrikes(this.Strikes()-damagedone);
     }
 
 
