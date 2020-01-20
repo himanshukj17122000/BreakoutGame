@@ -5,324 +5,248 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
-/**
- * Feel free to completely change this code or delete it entirely.
- * implements EventHandler<javafx.event.ActionEvent>
+/** CODE WRITTEN BY: Himanshu Jain (@hkj4)
+ *  This is the main class for the game Breakout in which
+ *  the user has to use a paddle to destroy all the bricks
+ *  on the screen. The private variables have been declared
+ *  and initialised in the main class. The game can be run by
+ *  running the Main.main()
  */
+
 public class Main extends Application {
     /**
-     * Start of the program.
-     * /**
-     * Initialize what will be displayed and how it will be updated.
+     * declared the global variables
+     * initialised some of the variables
+     * some variables remain constant throughout the program
      */
-
-    public static final String TITLE = "Example JavaFX";
+    public static final String TITLE = "Himanshooter";
     public static final int SIZE = 400;
     private static Timeline animation = new Timeline();
-    public static String filename = "";
-    public static int count = 1;
-    private static int damage =1;
-    Brick first= new Brick();
-    Brick second= new Brick();
-    Brick third= new Brick();
-    Brick fourth= new Brick();
-    Brick bomb1= new Brick();
-    Brick bomb2= new Brick();
-    public static final int FRAMES_PER_SECOND = 120;
+    private static int count = 1;
+    private static int numbricks = 0;
+    private static int damage = 1;
+    private Brick first = new Brick();
+    private Brick second = new Brick();
+    private Boolean started= false;
+    private Brick third = new Brick();
+    private Brick fourth = new Brick();
+    private Brick bomb1 = new Brick();
+    private Brick bomb2 = new Brick();
+    private int linenum;
+    public static final int FRAMES_PER_SECOND = 100;
     public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
     public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
     public static final Paint BACKGROUND = Color.BLACK;
-    public static final Paint HIGHLIGHT = Color.OLIVEDRAB;
     public static final String BOUNCER_IMAGE = "ball.gif";
-    public static int BOUNCER_SPEED = 50;
-    public static int SLOW_SPEED = 50;
-    public static final String paddle = "paddle.gif";
-    public static final Paint MOVER_COLOR = Color.BLACK;
-    public static int MOVER_SIZE = 100;
+    private int BOUNCER_SPEED = 70;
+    private static int numro = 0;
     public static final int long_paddle = 140;
-    public static final int MOVER_HEIGHT = 10;
-    private int MOVER_SPEED = 35;
-    public static final Paint GROWER_COLOR = Color.BISQUE;
-    public static final double GROWER_RATE = 1.1;
-    public static final int GROWER_SIZE = 50;
-    public static int score = 0;
-    public static int distance = 0;
-    public static boolean extended = false;
-    double directionX = 1;
-    double directionY = 1;
-    public static int scoregame = 0;
-    public static double time;
-    public ArrayList<Brick> brickw = new ArrayList<Brick>();
-    private Label label2 = new Label();
-    private Label label3 = new Label();
-    private Scene myScene;
-    private ImageView myBouncer;
-    private Rectangle myMover;
+    private static int distance = 0;
+    private static double directionX = 1;
+    private static double directionY = 1;
+    private static int scoregame = 0;
+    private ArrayList<Brick> brickw = new ArrayList<Brick>();
+    private static Label label2 = new Label();
+    private static Label label3 = new Label();
+    private static Label label4 = new Label();
+    private static Scene myScene;
+    private static ImageView myBouncer;
+    private static int lives = 3;
+    private static Stage stagee = new Stage();
+    paddle mover;
 
-
-
-    private Boolean move = false;
-    private static int lives=-1;
-    Button splas;
-
-    Stage stagee = new Stage();
-
+    /**
+     * first function that is called whenever the program is run
+     * it is run only once throughout the game. The dimensions
+     * of the stage are set in this class
+     * @param stage is the screen where the scene is displayed
+     */
     @Override
     public void start(Stage stage) {
-        // attach scene to the stage and display it
         makeScene("Level1.txt");
         stagee = stage;
-        stage.setScene(Splash());
+        SplashScreen splash= new SplashScreen();
+        stage.setScene(splash.SplashScreen());
+        splash.welcomeButton().setOnMouseClicked(e -> checkclick(stagee));
         stage.setTitle(TITLE);
         stage.show();
-
     }
 
+    /**
+     * this class is used to make the different scenes based on the level of the user
+     * if the user is done with level3, this function takes the user to the game over window
+     * @param levels allows us to choose the level the user is on and hence display the relevant screen
+     */
     public void makeScene(String levels) {
         if (count > 3) {
-            Image image = new Image(this.getClass().getClassLoader().getResourceAsStream("end.gif"));
-            ImageView imageView = new ImageView(image);
-            imageView.setX(0);
-            imageView.setY(0);
-            imageView.setFitHeight(400);
-            imageView.setFitWidth(400);
-            imageView.setPreserveRatio(true);
-            Button replay= new Button();
-            replay.setText("Replay");
-            replay.setOnMouseClicked(e->mouseclicked());
-            replay.setLayoutY(SIZE-50);
-            replay.setLayoutX(SIZE/2-40);
-            Group root = new Group();
-            Scene scene = new Scene(root, 400, 400,BACKGROUND);
-            root.getChildren().add(imageView);
-            root.getChildren().add(replay);
-            stagee.setScene(scene);
             animation.stop();
+            end endscreen= new end();
+            endscreen.Replay().setOnMouseClicked(e -> mouseclicked());
+            stagee.setScene(endscreen.EndScene());
         } else {
             myScene = setupGame(SIZE, SIZE, BACKGROUND, levels);
-//            myBouncer.setX(SIZE / 2-MOVER_SIZE/2+MOVER_SIZE/2);
-//            myBouncer.setY(SIZE-MOVER_HEIGHT-10-MOVER_HEIGHT);
             checkclick(stagee);
         }
     }
 
+    /**
+     * function that is called by clicking on the button of the last screen
+     * count has been set to 1 so the first level is displayed whenever the user wants to replay the game
+     */
     private void mouseclicked() {
-        count=1;
+        count = 1;
         changeScene();
     }
+    /**
+     * this function is called when the user clicks the button on the splash screen
+     * @param stage allows us to change the scene to the first level of the game
+     */
 
-    public Scene Splash() {
-        Label label1 = new Label("The rules of the game are:\n\t 1) Arrow Keys- Move the paddle \n\t 2) 4 Types of Bricks-\n\t\t" +
-                " a) Power-up- Has different power-ups like extra-life, " +
-                "\n\t\t double damaging ball and slower ball\n\t\t b) Stone- Takes 4 hits to be broken" +
-                " \n\t\t c) Normal- Takes 3 hits to be broken \n\t\t d) Bomb- Takes 1 hit and damages the neighbouring\n\t\t blocks " +
-                "\n\t 3) There are a number of Cheat Keys- C for catching the\n\t ball, D gives an extra life, F restarts the game, W\n\t increases the speed, Space increases the paddle's length" +
-                "\n\t 4) The paddle comes up by 1/2 when only 10 bricks and\n\t another 1/4 when only 4 bricks are left ");
-        label1.setTextFill(Color.web("#0076a3"));
-        label1.setLayoutX(10);
-        label1.setLayoutY(10);
-        splas = new Button("Welcome");
-        splas.setLayoutX(SIZE / 2.5);
-        splas.setLayoutY(SIZE / 1.6);
-        splas.setOnAction(e -> checkclick(stagee));
-        Group gro = new Group();
-        gro.getChildren().add(label1);
-        gro.getChildren().add(splas);
-        Scene Splash = new Scene(gro, SIZE, SIZE, BACKGROUND);
-        return Splash;
-    }
     private void checkclick(Stage stage) {
         stage.setScene(myScene);
         game();
     }
 
+    /**
+     * it is the game loop of the game and it allows us to play the animation required
+     * it calls step function within MILLISECOND_DELAY
+     */
     private void game() {
         KeyFrame frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY), e -> step(SECOND_DELAY));
         animation.setCycleCount(Timeline.INDEFINITE);
         animation.getKeyFrames().add(frame);
     }
 
-    // Create the game's "scene": what shapes will be in the game and their starting properties
+    /**
+     * this sets up the scenes for us. Allows us to put the paddle, the ball and the 3 different labels on the screen
+     * @param width is the width of the stage
+     * @param height is the height of the stage
+     * @param background is the background color of the scene
+     * @param level is the string that signifies which file is read to make the brickwall
+     * @return
+     */
     private Scene setupGame(int width, int height, Paint background, String level) {
-        // create one top level collection to organize the things in the scene
-
-        // make some shapes and set their properties
         Image image = new Image(this.getClass().getClassLoader().getResourceAsStream(BOUNCER_IMAGE));
         myBouncer = new ImageView(image);
-         Group root = new Group();
-        myMover = new Rectangle(width / 2 - MOVER_SIZE / 2, height - MOVER_HEIGHT - 20, MOVER_SIZE, MOVER_HEIGHT);
-        Image ima = new Image(this.getClass().getClassLoader().getResourceAsStream(paddle));
-        ImagePattern imagePattern = new ImagePattern(ima);
-        myMover.setFill(imagePattern);
+        Group root = new Group();
+        mover=new paddle();
+        setSpeed(70);
         this.myBouncer.setX((double) (width / 2) - this.myBouncer.getBoundsInLocal().getWidth() / 2.0D);
         this.myBouncer.setY((double) (height / 2) - this.myBouncer.getBoundsInLocal().getHeight() / 2.0D);
-//      myBouncer.setX(width / 2-MOVER_SIZE/2+MOVER_SIZE/2);
-//      myBouncer.setY(height-MOVER_HEIGHT-10-MOVER_HEIGHT);
-        label2.setLayoutY(SIZE / 1.2);
-        label2.setLayoutX(SIZE - 80);
-        label3.setLayoutY(SIZE / 1.1);
-        label3.setLayoutX(SIZE - 80);
-//      move=false;
-//      myGrower = new Rectangle(width / 2 - GROWER_SIZE / 2, height / 2 + 50, GROWER_SIZE, GROWER_SIZE);
-//      myGrower.setFill(GROWER_COLOR);
-        // order added to the group is the order in which they are drawn
-        root.getChildren().add(myBouncer);
-        root.getChildren().add(myMover);
-        root.getChildren().add(label2);
-        root.getChildren().add(label3);
-//      root.getChildren().add(myGrower);
+        setLayout(label2, 40,SIZE-20,root);
+        setLayout(label3, SIZE / 2,SIZE-20,root);
+        setLayout(label4, SIZE - 40,SIZE-20,root);
+        label4.setText("Level: " + count);
+        root.getChildren().addAll(myBouncer,mover.mover());
         brickwall(root, level);
         bombbricks();
-        // create a place to see the shapes
         Scene scene = new Scene(root, width, height, background);
-        // respond to input
         scene.setOnKeyPressed(e -> handleKeyInput(e.getCode()));
         return scene;
     }
 
-    // Change properties of shapes in small ways to animate them over time
-    // Note, there are more sophisticated ways to animate shapes, but these simple ways work fine to start
-    private void step(double elapsedTime) {
-//        if(move==true) {
+    private void setLayout(Label labels, int i, int j, Group base) {
+        labels.setLayoutX(i);
+        labels.setLayoutY(j);
+        labels.setFont(Font.font("Brush Script MT", 13));
+        labels.setTextFill(Color.web("#0076a3"));
+        base.getChildren().add(labels);
+    }
 
-        myBouncer.setX(myBouncer.getX() + BOUNCER_SPEED * elapsedTime * directionX);
-        myBouncer.setY(myBouncer.getY() + BOUNCER_SPEED * elapsedTime * directionY);
-        if((myBouncer.getY()>stagee.getHeight() || myBouncer.getY()<-20)&& lives<0){
-            count=4;
-            makeScene("End");}
-//        } else if((myBouncer.getY()>stagee.getHeight() || myBouncer.getY()<-20 && lives>=0)){
-//           lives--;
-//           return;
-//        }
-        //}
-        if((myBouncer.getY()>stagee.getHeight() || myBouncer.getY()<-20) && lives>=0){
+    /**
+     * sets the speed of the ball
+     * @param i is the speed that is passed in to change the speed of the ball
+     */
+    private void setSpeed(int i) {
+        BOUNCER_SPEED = i;
+    }
+
+    /**
+     * it is the function that is called by the game loop
+     * allows us to check the collisions happening in the game and take decisions based on that
+     * @param elapsedTime is the parameter passed on by the setupGame(). Changes the position of the ball in the game
+     */
+    private void step(double elapsedTime) {
+            checkMover();
+            myBouncer.setX(myBouncer.getX() + BOUNCER_SPEED * elapsedTime * directionX);
+            myBouncer.setY(myBouncer.getY() + BOUNCER_SPEED * elapsedTime * directionY);
+            checkBrickArrayList();
+            for (int i = 0; i < brickw.size(); i++) {
+                if ((myBouncer.getX() >= brickw.get(i).getImage().getX() && myBouncer.getX() <= brickw.get(i).getImage().getX() + brickw.get(i).getWidth() - 2) && (myBouncer.getY() >= brickw.get(i).getImage().getY() && myBouncer.getY() <= brickw.get(i).getImage().getY() + brickw.get(i).getHeight())) {
+                    directionY *= -1;
+                    brickw.get(i).ifhit(damage);
+                    checkPower(brickw.get(i).getType(), brickw.get(i).Strikes());
+                    checkBomb(brickw.get(i), bomb1);
+                    checkBomb(brickw.get(i),bomb2);
+                        if (brickw.get(i).Strikes() <= 0) {
+                        AudioClip note = new AudioClip(this.getClass().getResource("pong_beep.wav").toString());
+                        note.play();
+                        brickw.get(i).getImage().imageProperty().set(null);
+                        brickw.remove(brickw.get(i));
+                        String a = "";
+                        scoregame += 5;
+                        a += scoregame;
+                        label2.setText("Score: " + a);
+                        label3.setText("Lives: " + lives);
+                        return; }
+                    directionY*= -1; }}
+            checkBouncer(); }
+
+    private void checkPower(String type, int strikes) {
+        if (type.equals("brick2.gif") && strikes <= 0) {
+            int rand = getRandomNumberInRange(2, 0);
+            if (rand == 0) {
+                changeSpeed();
+            }
+            if (rand == 1) {
+                increaseLives();
+            }
+            if (rand == 2) {
+                changeDamage();
+            } } }
+
+    private void checkBomb(Brick inArray, Brick toCheck){
+        if (inArray == toCheck && inArray.Strikes() <= 0) {
+            inArray.getImage().imageProperty().set(null);
+            brickw.remove(inArray);
+            scoregame += 5;
+            if (inBounds(first)) {
+                first.getImage().imageProperty().set(null);
+                brickw.remove(first);
+                scoregame += 5;
+            }
+            if (inBounds(second)) {
+                second.getImage().imageProperty().set(null);
+                brickw.remove(second);
+                scoregame += 5;
+            }
+        }
+    }
+
+
+    private void checkBouncer() {
+        if ((myBouncer.getY() > stagee.getHeight() || myBouncer.getY() < -20) && lives < 0) {
+            count = 4;
+            makeScene("End");
+        }
+
+        if ((myBouncer.getY() > stagee.getHeight() || myBouncer.getY() < -20) && lives >= 0) {
             lives--;
             changeScene();
-
         }
-        if (brickw.size() == 0) {
-            count++;
-            changeScene();
-        }
-        if (brickw.size() <= 10 && brickw.size()>4) {
-            myMover.setY(SIZE / 1.7);
-            if (myMover.getBoundsInParent().intersects(myBouncer.getBoundsInParent())) {
-                directionY *= -1;
-                directionX*=-1;
-            }}
-//            if (myBouncer.getY() + myBouncer.getBoundsInLocal().getHeight() >= myScene.getHeight()) {
-//                directionY *= -1;
-//            }
-
-         if (brickw.size() <= 4) {
-            myMover.setY(0);
-            if (myMover.getBoundsInParent().intersects(myBouncer.getBoundsInParent())) {
-                directionY *= -1;
-                directionX*=-1;
-            }if (myBouncer.getY() <= 0) {
-                directionY= 1;
-            }
-            if (myBouncer.getY() + myBouncer.getBoundsInLocal().getHeight() >= myScene.getHeight()) {
-                directionY *= -1;
-            }}
-//        } Brick first= new Brick(); Brick second= new Brick();Brick third= new Brick();Brick fourth= new Brick();Brick fifth= new Brick();
-//        Brick thirteen= new Brick();Brick fourteen= new Brick();Brick fifteen= new Brick();Brick sixteen= new Brick();Brick seventeen= new Brick();
-        //, , , , , , , , , ;
-//      if(count==3){
-//         first= brickw.get(0);
-//         System.out.print(first.Strikes());
-//         second= brickw.get(1); System.out.print(first.Strikes());
-//         third= brickw.get(2);System.out.print(first.Strikes());
-//       fourth= brickw.get(3);System.out.print(first.Strikes());
-//         fifth= brickw.get(4);System.out.print(first.Strikes());
-//         thirteen= brickw.get(13);System.out.print(first.Strikes());
-//         fourteen= brickw.get(14);System.out.print(first.Strikes());
-//       fifteen= brickw.get(15);System.out.print(first.Strikes());
-//       sixteen= brickw.get(16);System.out.print(first.Strikes());
-////         seventeen= brickw.get(17);System.out.print(first.Strikes());}
-//        for(Brick c:brickw){
-//            System.out.print(c.Strikes());
-//        }
-        for (int i = 0; i < brickw.size(); i++) {
-         // if(myBouncer.getBoundsInLocal().intersects(brickw.get(i).getImage().getBoundsInLocal())){
-//            System.out.print(brickw.get(i).Strikes());
-
-           if ((myBouncer.getX() >= brickw.get(i).getImage().getX() && myBouncer.getX() <= brickw.get(i).getImage().getX() + brickw.get(i).getWidth()-2) && (myBouncer.getY() >= brickw.get(i).getImage().getY() && myBouncer.getY() <= brickw.get(i).getImage().getY() + brickw.get(i).getHeight())) {
-//               System.out.println(brickw.get(i).getType());
-               System.out.println(damage);
-               directionY *= -1;
-               directionX*=-1;
-                brickw.get(i).ifhit(damage);
-//                System.out.print(brickw.get(i).getType());
-                if(brickw.get(i).getType().equals("brick2.gif") && brickw.get(i).Strikes()<=0){
-                    int rand= getRandomNumberInRange(2,0);
-                    if(rand==0){
-                    changeSpeed();}
-                    if(rand==1){
-                        increaseLives();
-                    }
-                    if(rand==2){
-                    changeDamage();}
-
-                }
-               if(brickw.get(i)==bomb1 && brickw.get(i).Strikes()<=0) {
-                   brickw.get(i).getImage().imageProperty().set(null);
-                   brickw.remove(brickw.get(i));
-                   scoregame += 5;
-                  if(inBounds(first)){
-                      first.getImage().imageProperty().set(null);
-                      brickw.remove(first);
-                      scoregame += 5;
-                  }
-                   if(inBounds(second)){
-                       second.getImage().imageProperty().set(null);
-                       brickw.remove(second);
-                       scoregame += 5;
-                   }}
-               if(brickw.get(i)==bomb2 && brickw.get(i).Strikes()<=0){
-                   brickw.get(i).getImage().imageProperty().set(null);
-                   brickw.remove(brickw.get(i));
-                   scoregame += 5;
-                   if(inBounds(third)){
-                       third.getImage().imageProperty().set(null);
-                       brickw.remove(third);
-                       scoregame += 5;
-                   }
-                   if(inBounds(fourth)){
-                       fourth.getImage().imageProperty().set(null);
-                       brickw.remove(fourth);
-                       scoregame += 5;
-                   }
-               }
-                if (brickw.get(i).Strikes() <= 0) {
-                    brickw.get(i).getImage().imageProperty().set(null);
-                    brickw.remove(brickw.get(i));
-                    String a = "";
-                    scoregame += 5;
-                    a += scoregame;
-                    label2.setText("The score \nis " + a);
-                    label2.setTextFill(Color.web("#0076a3"));
-                    label3.setText("\nLives: " + lives);
-                    label3.setTextFill(Color.web("#0076a3"));
-                    return;
-                }
-                directionY *= -1;
-            } }
         if (myBouncer.getX() + myBouncer.getBoundsInLocal().getWidth() >= myScene.getWidth()) {
             directionX *= -1;
         }
@@ -332,39 +256,86 @@ public class Main extends Application {
         if (myBouncer.getY() <= 0) {
             directionY *= -1;
         }
-        if (myMover.getBoundsInParent().intersects(myBouncer.getBoundsInParent()) && (myBouncer.getY() + myBouncer.getBoundsInLocal().getHeight() - 3 > myMover.getY())) {
-            directionX *= -1;
+
+    }
+    private void checkBrickArrayList(){
+        if (brickw.size() == 0) {
+            count++;
+            changeScene();
+        }
+        if (brickw.size() <= 10 && brickw.size() > 4) {
+            mover.mover().setY(SIZE / 1.7);
+                if (mover.mover().getBoundsInParent().intersects(myBouncer.getBoundsInParent())) {
+                directionY *= -1;
+                directionX *= -1;
+            }
+        }
+
+        if (brickw.size() <= 4) {
+            mover.mover().setY(0);
+                if (mover.mover().getBoundsInParent().intersects(myBouncer.getBoundsInParent())) {
+                directionY *= -1;
+                directionX *= -1;
+            }
+            if (myBouncer.getY() <= 0) {
+                directionY = 1;
+            }
+            if (myBouncer.getY() + myBouncer.getBoundsInLocal().getHeight() >= myScene.getHeight()) {
+                directionY *= -1;
+            }
+        }
+    }
+
+    private void checkMover() {
+        if(mover.mover().getX()>=SIZE){
+            mover.mover().setX(0);
+        }
+        if(mover.mover().getX()+mover.mover().getWidth()<=0){
+            mover.mover().setX(SIZE-mover.mover().getWidth());
+        }
+        if (mover.mover().getBoundsInParent().intersects(myBouncer.getBoundsInParent())) {
             directionY *= -1;
         }
-        if (myMover.getBoundsInParent().intersects(myBouncer.getBoundsInParent())) {
+        if (mover.mover().getBoundsInParent().intersects(myBouncer.getBoundsInParent()) && (myBouncer.getY() + myBouncer.getBoundsInLocal().getHeight() - 3 >mover.mover().getY())) {
+            directionX *= -1;
             directionY *= -1;
         }
     }
 
+    /**
+     * Powerup function that changes the damage made by the ball on the brick for 10 seconds
+     */
     private void changeDamage() {
-        damage=2;
+        damage = 2;
         new java.util.Timer().schedule(
                 new java.util.TimerTask() {
                     @Override
                     public void run() {
-                        damage=1;
+                        damage = 1;
                     }
                 },
                 5000
         );
     }
 
+    /**
+     * another powerup that increases the lives of the player
+     */
     private void increaseLives() {
         lives++;
     }
 
+    /**
+     * another powerup that changes the speed of the ball for 10 seconds
+     */
+
     private void changeSpeed() {
-        BOUNCER_SPEED=30;
+        setSpeed(50);
         new java.util.Timer().schedule(
                 new java.util.TimerTask() {
                     @Override
                     public void run() {
-                        BOUNCER_SPEED=50;
+                        setSpeed(70);
                     }
                 },
                 10000
@@ -373,13 +344,15 @@ public class Main extends Application {
     }
 
     private boolean inBounds(Brick brick) {
-        if(brick!=null){
-            return true;
-        }
-        return false;
+        return (brick != null);
     }
 
+    /**
+     * changes the scene based on the count variable
+     * allows us to navigate between different levels of the game
+     */
     private void changeScene() {
+
         SceneChange();
         if (count == 2) {
             makeScene("level2.txt");
@@ -393,185 +366,170 @@ public class Main extends Application {
         }
     }
 
-    private void bombbricks(){
-        if(count==3) {
+    /**
+     * made to check the bomb bricks in the 3rd level
+     * allows us to destroy the neighbouring bricks when the bomb brick is destroyed
+     */
+    private void bombbricks() {
+        if (count == 3) {
             first = brickw.get(0);
             second = brickw.get(10);
             third = brickw.get(3);
             fourth = brickw.get(13);
-            bomb1= brickw.get(7);
-            bomb2= brickw.get(8);
-            System.out.println(first.Strikes());
-            System.out.println(second.Strikes());
-            System.out.println(third.Strikes());
-            System.out.println(fourth.Strikes());
-            System.out.println(bomb1.Strikes());
-            System.out.println(bomb2.Strikes());
-
+            bomb1 = brickw.get(7);
+            bomb2 = brickw.get(8);
         }
 
     }
 
-    // What to do each time a key is pressed
+    /**
+     * function that is used to perform action based on the specific actions by the user
+     * @param code checks the key pressed by the user and allows us to perform different things based on what was pressed
+     */
+
     private void handleKeyInput(KeyCode code) {
         if (code == KeyCode.RIGHT) {
-            if (myMover.getX() + myMover.getWidth() >= myScene.getWidth()) {
-                return;
-            }
-            myMover.setX(myMover.getX() + MOVER_SPEED);
-        }
-        //&&move
-        else if (code == KeyCode.LEFT) {
-            if (myMover.getX() <= 0) {
-                return;
-            }
-            myMover.setX(myMover.getX() - MOVER_SPEED);
-        } else if (code == KeyCode.SPACE && !extended) {
-            myMover.setWidth(long_paddle);
-            myMover.setX(myMover.getX() - (myMover.getWidth() / 4));
-            extended = true;
-        } else if (code == KeyCode.SPACE && extended) {
-            myMover.setWidth(100);
-            myMover.setX(myMover.getX() + (myMover.getWidth() / 4));
-            extended = false;
+            if(!started){
+                if (mover.mover().getX() + mover.mover().getWidth() >= myScene.getWidth())
+                    if (mover.mover().getX() + mover.mover().getWidth() >= myScene.getWidth()) {
+                        return;
+                    }}mover.mover().setX(mover.mover().getX() +mover.getSpeed());
+        } else if (code == KeyCode.LEFT) {
+            if(!started){
+                if (mover.mover().getX() <= 0) {
+                    return;
+                }}
+           mover.mover().setX(mover.mover().getX() - mover.getSpeed());}
+        else if (code == KeyCode.SPACE && !mover.getExtended()) {
+            mover.setLayout(long_paddle,mover.mover().getX() - (mover.mover().getWidth() / 4),true);
+        } else if (code == KeyCode.SPACE) {
+            mover.setLayout(100,mover.mover().getX()+ (mover.mover().getWidth() / 4),false);
         } else if (code == KeyCode.W) {
-            MOVER_SPEED = 2 * MOVER_SPEED;
-            BOUNCER_SPEED = 2 * BOUNCER_SPEED;
-
-        } else if (code == KeyCode.U) {
-            MOVER_SPEED = MOVER_SPEED / 2;
-            BOUNCER_SPEED = BOUNCER_SPEED / 2;
-
+            mover.setMOVER_SPEED(2*mover.getSpeed());
+            setSpeed(2 * BOUNCER_SPEED);
         }
-      else if(code==KeyCode.R){
-          changeScene();
-          scoregame=0;
-      }
-      else if(code==KeyCode.N){
-          count++;
-          changeScene();
+        else if (code == KeyCode.U) {
+            setSpeed(BOUNCER_SPEED / 2);
         }
-      else if(code==KeyCode.B){
-            count--;
+        else if (code == KeyCode.R) {
             changeScene();
+            scoregame = 0;
         }
-        else if (code == KeyCode.C && !extended) {
-            myMover.setWidth(SIZE);
-            myMover.setX(0);
-            extended = true;
+        else if (code == KeyCode.L) {
+            lives++;}
+            else if (code == KeyCode.C && !mover.getExtended()) {
+                mover.setLayout(SIZE,0,true);
+            } else if (code == KeyCode.C) {
+            mover.setLayout(mover.getMoverSize(),myScene.getWidth() / 2.5,false);
+
+        } else if (code == KeyCode.P) {
+            setSpeed(70);
+            animation.playFromStart();
+            started=true;
         }
-        else if (code == KeyCode.C && extended ) {
-            myMover.setWidth(70);
-            myMover.setX(myScene.getWidth()/2.5);
-            extended = false;
-        }
-        else if(code== KeyCode.P){
-            animation.play();
-        }
+        changeLevels(code, KeyCode.DIGIT3,3);
+        changeLevels(code, KeyCode.DIGIT2,2);
+        changeLevels(code, KeyCode.DIGIT1,1);
+
     }
+
+    private void changeLevels(KeyCode key, KeyCode buttonPressed, int countnum){
+        if(key==buttonPressed){
+            count=countnum;
+            changeScene();
+        } }
+
+    /**
+     * this makes the brickwall by reading the text file
+     * @param c is the group that all the bricks are added to
+     * @param filenam is the file that is being read and is basically the levels value in setupGame
+     */
+
     private void brickwall(Group c, String filenam) {
-        brickw.clear();
+        initialiser();
         Scanner sc = new Scanner(getClass().getClassLoader().getResourceAsStream(filenam));
-        int numbricks = 0;
-        setDistance();
-        System.out.print(distance);
-        int linenum = 0;
-        String eof = "";
-        int numro = 0;
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
             linenum++;
-
             if (linenum > 1) {
-                numro++;
-            }
+                numro++; }
             numbricks = 0;
             Scanner lineScanner = new Scanner(line);
             while (lineScanner.hasNext()) {
                 int hits = lineScanner.nextInt();
                 if (hits == 1) {
                     bomb bo = new bomb();
-                    ImageView im = bo.getImage();
-                    im.setX(SIZE / 8 + numbricks * Brick.WIDTH);
-                    brickw.add(bo);
-                    numbricks++;
-                    im.setY(numro * Brick.HEIGHT + numro * 10+distance);
-                    c.getChildren().add(im);
+                    makelayers(bo, c);
                 } else if (hits == 2) {
                     normalbr norm = new normalbr();
-                    ImageView im = norm.getImage();
-                    brickw.add(norm);
-                    im.setX(SIZE / 8 + numbricks * Brick.WIDTH);
-                    numbricks++;
-                    im.setY(numro * Brick.HEIGHT + numro * 10+distance);
-                    c.getChildren().add(im);
-
-                } else if (hits == 3) {
+                    makelayers(norm, c); }
+                else if (hits == 3) {
                     powerup power = new powerup();
-                    ImageView im = power.getImage();
-                    im.setX(SIZE / 8 + numbricks * Brick.WIDTH);
-                    numbricks++;
-                    brickw.add(power);
-                    im.setY(numro * Brick.HEIGHT + numro * 10+distance);
-                    c.getChildren().add(im);
-
-                } else if (hits == 4) {
+                    makelayers(power, c); }
+                else if (hits == 4) {
                     stone sto = new stone();
-                    ImageView im = sto.getImage();
-                    im.setX(SIZE / 8 + numbricks * Brick.WIDTH);
-                    numbricks++;
-                    brickw.add(sto);
-                    im.setY(numro * Brick.HEIGHT + numro * 10+distance);
-                    c.getChildren().add(im);
-
-                }
+                    makelayers(sto, c); }
                 if (hits == 0) {
-                    numbricks++;
+                    numbricks++;}}}}
 
-                }
-            }
-        }
-
-
-    }
-    private static void setDistance(){
-        distance= getRandomNumberInRange(5,3)*10;
+    private void initialiser() {
+        numbricks = 0;
+        numro = 0;
+        brickw.clear();
+        setDistance();
+        linenum = 0;
     }
 
+    /**
+     * used to make the different bricks based on the number of hits of each
+     * @param brick is the brick type that we have
+     * @param brickwall is the group that all the bricks are a part of
+     */
+    private void makelayers(Brick brick, Group brickwall) {
+        ImageView im = brick.getImage();
+        im.setX(SIZE / 8 + numbricks * Brick.WIDTH);
+        brickw.add(brick);
+        numbricks++;
+        im.setY(numro * Brick.HEIGHT + numro * 10 + distance);
+        brickwall.getChildren().add(im);
+    }
+
+    private static void setDistance() {
+        distance = getRandomNumberInRange(5, 3) * 10;
+    }
+
+    /**
+     * used to get a random number for setting the distance of the bricks from the top, the direction of the ball when released
+     * and to decide the powerup that the powerup brick has
+     * @param max is the maximum integer that we want
+     * @param min is the smallest integer that we want
+     * @return returns a number between and including the maximum and minimum numbers
+     */
     private static int getRandomNumberInRange(int max, int min) {
         Random r = new Random();
-        return r.nextInt(max-min+1)+min;
+        return r.nextInt(max - min + 1) + min;
 
     }
+
+    /**
+     * used to pause the animation and change the different scenes on the stage
+     */
     private void SceneChange() {
-        BOUNCER_SPEED = 30;
-        MOVER_SPEED = 70;
+        setSpeed(70);
+        started=false;
+        mover.setMOVER_SPEED(50);
         animation.pause();
-        scoregame=0;
-//        startMessage.setVisible(true);
-        myBouncer.setX(myScene.getWidth()/2);
+        scoregame = 0;
+        myBouncer.setX(myScene.getWidth() / 2);
         myBouncer.setY(0);
-        directionX = 1;
+        if(getRandomNumberInRange(1,-1)==0|| getRandomNumberInRange(1,-1)==-1){
+            directionX=-1;
+        }else directionX=1;
         directionY = 1;
-        extended=false;
+
     }
 
     public static void main(String[] args) {
         launch(args);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -3,6 +3,10 @@ package breakout;
 
 import javafx.scene.image.ImageView;
 
+/** CODE WRITTEN BY: Himanshu Jain (@hkj4)
+ * Class of brick that has the functionalities that are common in all the different types of bricks
+ * It has different methods to set up the different values of the bricks
+ */
 
 public class Brick{
     public static final int WIDTH = 40;
@@ -36,10 +40,6 @@ public class Brick{
    }
 
 
-
-
-
-
     public void setBrickImage(ImageView brickImage) {
         this.Image = brickImage;
         this.Image.setFitWidth(WIDTH);
@@ -60,19 +60,6 @@ public class Brick{
     public void setY(double y){
         this.Image.setY(y);
     }
-
-
-    public String destroyed(){
-
-        return null;
-    }
-
-
-    public void setLocation(double x, double y){
-        this.setX(x);
-        this.setY(y);
-    }
-
 
     public ImageView getImage(){
         return this.Image;
