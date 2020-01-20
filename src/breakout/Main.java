@@ -67,7 +67,7 @@ public class Main extends Application {
     private static ImageView myBouncer;
     private static int lives = 3;
     private static Stage stagee = new Stage();
-    paddle mover;
+    private paddle mover;
 
     /**
      * first function that is called whenever the program is run
@@ -363,6 +363,8 @@ public class Main extends Application {
 
         if (count == 2) {
             makeScene("level2.txt");
+//            mover.setMOVER_SPEED(80);
+//            BOUNCER_SPEED=80;
 
         } else if (count == 3) {
             makeScene("level3.txt");
