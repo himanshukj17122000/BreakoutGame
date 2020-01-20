@@ -38,6 +38,7 @@ public class Main extends Application {
     private static int count = 1;
     private static int numbricks = 0;
     private static int damage = 1;
+    private String a = "";
     private Brick first = new Brick();
     private Brick second = new Brick();
     private Boolean started= false;
@@ -180,7 +181,8 @@ public class Main extends Application {
      * @param elapsedTime is the parameter passed on by the setupGame(). Changes the position of the ball in the game
      */
     private void step(double elapsedTime) {
-            checkMover();
+           label3.setText("Lives: " + lives);
+           checkMover();
             myBouncer.setX(myBouncer.getX() + BOUNCER_SPEED * elapsedTime * directionX);
             myBouncer.setY(myBouncer.getY() + BOUNCER_SPEED * elapsedTime * directionY);
             checkBrickArrayList();
@@ -196,11 +198,7 @@ public class Main extends Application {
                         note.play();
                         brickw.get(i).getImage().imageProperty().set(null);
                         brickw.remove(brickw.get(i));
-                        String a = "";
-                        scoregame += 5;
-                        a += scoregame;
-                        label2.setText("Score: " + a);
-                        label3.setText("Lives: " + lives);
+                            changeScore();
                         return; }
                     directionY*= -1; }}
             checkBouncer(); }
@@ -222,16 +220,16 @@ public class Main extends Application {
         if (inArray == toCheck && inArray.Strikes() <= 0) {
             inArray.getImage().imageProperty().set(null);
             brickw.remove(inArray);
-            scoregame += 5;
+            changeScore();
             if (inBounds(first)) {
                 first.getImage().imageProperty().set(null);
                 brickw.remove(first);
-                scoregame += 5;
+                changeScore();
             }
             if (inBounds(second)) {
                 second.getImage().imageProperty().set(null);
                 brickw.remove(second);
-                scoregame += 5;
+                changeScore();
             }
         }
     }
@@ -258,6 +256,15 @@ public class Main extends Application {
         }
 
     }
+    private void changeScore(){
+        scoregame+=5;
+        changeLabel();
+    }
+
+    private void changeLabel() {
+        label2.setText("Score: "+scoregame);
+    }
+
     private void checkBrickArrayList(){
         if (brickw.size() == 0) {
             count++;
@@ -352,8 +359,8 @@ public class Main extends Application {
      * allows us to navigate between different levels of the game
      */
     private void changeScene() {
-
         SceneChange();
+
         if (count == 2) {
             makeScene("level2.txt");
 
@@ -414,6 +421,7 @@ public class Main extends Application {
         else if (code == KeyCode.R) {
             changeScene();
             scoregame = 0;
+            changeLabel();
         }
         else if (code == KeyCode.L) {
             lives++;}
@@ -423,7 +431,6 @@ public class Main extends Application {
             mover.setLayout(mover.getMoverSize(),myScene.getWidth() / 2.5,false);
 
         } else if (code == KeyCode.P) {
-            setSpeed(70);
             animation.playFromStart();
             started=true;
         }
@@ -520,6 +527,7 @@ public class Main extends Application {
         mover.setMOVER_SPEED(50);
         animation.pause();
         scoregame = 0;
+        changeLabel();
         myBouncer.setX(myScene.getWidth() / 2);
         myBouncer.setY(0);
         if(getRandomNumberInRange(1,-1)==0|| getRandomNumberInRange(1,-1)==-1){

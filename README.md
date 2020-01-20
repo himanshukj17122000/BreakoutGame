@@ -39,6 +39,13 @@ bricks; audio is played when a brick is destroyed
 
 
 ### Notes/Assumptions
+I had a number of boolean values that I use to check for power-ups like elongating the paddle. I have also used the inbuilt timer function to change the power-up values after 10 seconds. 
+In checking the collision of the ball with the paddle, I have added a buffer of 3 on the sides to make the bouncing off movement better. I have also assumed that the ball changes just the Y direction 
+after hitting a brick. I have assumed that the screen size won't be changed since some values are according to the screen size and might get distorted if the screen size changes. 
+
+To play the game after many tries, I would recommmend using 'U' to decrease the speed of the ball as the ball becomes really fast and it's really hard to get to it. I have made the starting direction of the ball
+random and the brick's configuration also change in every game as I use the random function for decising the brickwall's distance from the top of the screen. 
+
 
 
 ### Impressions
