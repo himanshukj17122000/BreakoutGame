@@ -22,7 +22,6 @@ public class Brick{
     public int Strikes(){
         return this.strikes;
     }
-
     /**
      * we get the screen width of the game we are playing
      * @return the screen width
@@ -30,6 +29,7 @@ public class Brick{
     public int getWidth(){
         return this.WIDTH;
     }
+
 
     /**
      * we get the screen height of the game we are playing for working with it while placing the brick
@@ -59,8 +59,8 @@ public class Brick{
      * this returns the type of the brick that has just been made or destroyed which is useful for the powerup and the bomb bricks
      * @return the string which represents the type of brick just destroyed
      */
-   public String getType(){
-        return this.typename;
+    public String getType(){
+     return this.typename;
    }
 
     /**
@@ -72,6 +72,7 @@ public class Brick{
         this.Image.setFitWidth(WIDTH);
         this.Image.setFitHeight(HEIGHT);
     }
+
 
     /**
      * it is used to set the number of hits each brick has

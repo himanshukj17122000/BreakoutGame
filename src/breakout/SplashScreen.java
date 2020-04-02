@@ -51,10 +51,11 @@ public class SplashScreen {
             SplashScreen= new Scene(gro, SIZE, SIZE, Color.BLACK);
     }
 
-    /**
+     /**
      * the splashscreen has been made in the constructor and this method is called in the main class to get the first screen that comes up when the game starts
      * @return the scene names SplashScreen which is displayed on the screen when the game comes up
      */
+
     public Scene SplashScreen(){
         return SplashScreen;
     }
@@ -63,6 +64,7 @@ public class SplashScreen {
      * it is used for setting the button and further manipulation with it
      * @return the button that has been made so that it could respond the mouse inputs that are given
      */
+
     public Button welcomeButton(){
         return splash;
     }

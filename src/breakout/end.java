@@ -45,10 +45,19 @@ public class end {
         EndScreen = new Scene(root, SIZE, SIZE, BACKGROUND);
         root.getChildren().addAll(imageView,replay,last);
     }
-
+    
+    /**
+     * the end scene has been made in the constructor and this method is called when the game ends
+     * @return the scene names EndScreen which is displayed on the screen when the game ends or the player loses
+     */
     public Scene EndScene(){
         return this.EndScreen;
     }
+    
+    /**
+     * it is used for setting the button and further manipulation with it
+     * @return the button that has been made so that it could respond the mouse inputs that are given
+     */
     public Button Replay(){
         return this.replay;
     }
